@@ -1,0 +1,13 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: petclinic
+resources:
+  - namespace.yaml
+  - db.yaml
+  - petclinic.yaml
+
+# Update images
+images:
+  - name: dsyer/petclinic                                # Filter/Match
+    newName: 10.38.48.51:5000/petclinic # Replace
+    newTag: 1.0.0                                         # Appends to name. 
