@@ -4,3 +4,5 @@ metadata:
   name: petclinic
   labels:
     app.kubernetes.io/name: petclinic
+  annotations:
+    prometheus.io/scrape: 'true'

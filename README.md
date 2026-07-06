@@ -1,3 +1,28 @@
+# Ryan's Steps
+
+The Quickstart 
+
+Build the container
+```
+./mvnw spring-boot:build-image -DskipTests
+```
+
+Retag it and push to your registry. Example below.
+```
+HABOR_IP="10.38.48.51:5000"
+HARBOR_PROJECT="demo"
+podman tag docker.io/library/spring-petclinic:4.0.0-SNAPSHOT ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT
+podman push ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT --tls-verify=false
+```
+
+
+
+
+
+
+
+# ORIGINAL BELOW
+
 # Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)
 
 [![Open in Gitpod](https://gitpod.io/button/open-in-gitpod.svg)](https://gitpod.io/#https://github.com/spring-projects/spring-petclinic) [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://github.com/codespaces/new?hide_repo_select=true&ref=main&repo=7517918)
