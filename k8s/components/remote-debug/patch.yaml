@@ -1,0 +1,20 @@
+# Enables JDWP on :5005. JVM reads JAVA_TOOL_OPTIONS automatically
+# (no Dockerfile / entrypoint change required).
+#
+# suspend=n  → app starts without waiting for a debugger (probes stay healthy)
+# address=*  → listen on all interfaces (required inside containers)
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: petclinic
+spec:
+  template:
+    spec:
+      containers:
+        - name: workload
+          env:
+            - name: JAVA_TOOL_OPTIONS
+              value: -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+          ports:
+            - name: jdwp
+              containerPort: 5005

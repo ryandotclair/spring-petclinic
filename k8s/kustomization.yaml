@@ -7,6 +7,12 @@ resources:
   - petclinic.yaml
   - ingress.yaml
 
+# Toggle remote JDWP debugging (dev demos only — never leave on in prod).
+# Uncomment the two lines below to enable; re-comment to disable (prod).
+# components:
+  - components/remote-debug
+
+
 # Update images
 images:
   - name: dsyer/petclinic                    # Filter/Match

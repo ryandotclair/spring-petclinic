@@ -47,10 +47,48 @@ Git Commit, and add the repo to an NKP Project's CI/CD.
 
 To confirm deployment:
 ```bash
-NAMESPACE="petsclinic"
+NAMESPACE="pet-clinic"
 
 watch kubectl get cluster,pod,svc,deploy,pvc,ing -n ${NAMESPACE}
 ```
+
+## Remote debugging (JDWP) — optional / demos
+
+Spring Boot itself is not special here: any JVM app can accept a debugger via the
+JDWP agent. With this project's Dockerfile (`ENTRYPOINT ["java", "-jar", ...]`),
+set **`JAVA_TOOL_OPTIONS`** (the JVM applies it automatically). **`JAVA_OPTS`
+alone will not work** — nothing in the entrypoint passes it through.
+
+### Toggle on/off with Kustomize
+
+In `k8s/kustomization.yaml`, uncomment (enable) or re-comment (disable):
+
+```yaml
+components:
+  - components/remote-debug
+```
+
+That injects:
+
+```text
+JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+```
+
+and opens container port `5005`. Use `suspend=n` so the app still starts and
+satisfies probes when no debugger is attached.
+
+Commit / sync, then port-forward and attach from VS Code:
+
+```bash
+kubectl port-forward -n pet-clinic deploy/petclinic 5005:5005
+```
+
+In VS Code: **Run and Debug → "Attach to Petclinic (K8s)"** (see
+`.vscode/launch.json`). Set breakpoints in `src/main/java/...` and hit the app
+via ingress / `petclinic.local`.
+
+Do **not** expose `5005` on a Service or Ingress — port-forward keeps it
+local to your machine. Leave the component commented for "prod" demos.
 
 Pro Tips:
 
