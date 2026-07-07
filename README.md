@@ -61,11 +61,16 @@ alone will not work** — nothing in the entrypoint passes it through.
 
 ### Toggle on/off with Kustomize
 
-In `k8s/kustomization.yaml`, uncomment (enable) or re-comment (disable):
+In `k8s/kustomization.yaml`, uncomment the **entire** patch block (enable) or
+re-comment it (disable). Comment out both `patches:` and the list item together —
+a partially commented block breaks YAML and can add the path to `resources` by mistake.
 
 ```yaml
-components:
-  - components/remote-debug
+patches:
+  - path: components/remote-debug/patch.yaml
+    target:
+      kind: Deployment
+      name: petclinic
 ```
 
 That injects:

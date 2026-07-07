@@ -8,10 +8,12 @@ resources:
   - ingress.yaml
 
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
-# Uncomment the two lines below to enable; re-comment to disable (prod).
-# components:
-  - components/remote-debug
-
+# Uncomment the patch block below to enable; re-comment to disable (prod).
+patches:
+  - path: components/remote-debug/patch.yaml
+    target:
+      kind: Deployment
+      name: petclinic
 
 # Update images
 images:
