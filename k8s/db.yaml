@@ -1,8 +1,6 @@
 ---
 # Managed by CloudNativePG. The operator provisions:
-#   - Service demo-db-rw  (primary, read-write)
-#   - Service demo-db-ro  (replicas, read-only)
-#   - Service demo-db-r   (any instance)
+#   - Service demo-db-rw (primary, read-write) — only this service is kept
 #   - Secret  demo-db-app (username, password, dbname, host, port, uri, jdbc-uri)
 #   - PVC(s) for each instance
 apiVersion: postgresql.cnpg.io/v1
@@ -24,3 +22,9 @@ spec:
   storage:
     storageClass: nutanix-volume
     size: 10Gi
+
+  # Drop unused services so only demo-db-rw is created
+  managedServices:
+    disabledDefaultServices:
+      - ro
+      - r

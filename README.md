@@ -52,6 +52,13 @@ NAMESPACE="petsclinic"
 watch kubectl get cluster,pod,svc,deploy,pvc,ing -n ${NAMESPACE}
 ```
 
+Pro Tips:
+
+To force flux to take most recent change without waiting on the polling cycle:
+```
+alias forceflux='flux reconcile source git petclinic -n ${NAMESPACE} && flux reconcile kustomization petclinic -n ${NAMESPACE}'
+```
+
 # ORIGINAL PETCLINIC README BELOW
 
 # Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)

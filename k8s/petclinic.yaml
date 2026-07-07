@@ -38,20 +38,31 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
 
-            # Credentials + JDBC URL come from the CloudNativePG-managed secret
-            - name: SPRING_DATASOURCE_URL
+            # application-postgres.properties expects POSTGRES_URL / POSTGRES_USER / POSTGRES_PASS
+            # Build URL from CNPG secret fields (do NOT use jdbc-uri — it embeds credentials)
+            - name: PGHOST
               valueFrom:
                 secretKeyRef:
                   name: demo-db-app
-                  key: jdbc-uri
-
-            - name: SPRING_DATASOURCE_USERNAME
+                  key: host
+            - name: PGPORT
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db-app
+                  key: port
+            - name: PGDATABASE
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db-app
+                  key: dbname
+            - name: POSTGRES_URL
+              value: jdbc:postgresql://$(PGHOST):$(PGPORT)/$(PGDATABASE)
+            - name: POSTGRES_USER
               valueFrom:
                 secretKeyRef:
                   name: demo-db-app
                   key: username
-
-            - name: SPRING_DATASOURCE_PASSWORD
+            - name: POSTGRES_PASS
               valueFrom:
                 secretKeyRef:
                   name: demo-db-app
@@ -65,11 +76,20 @@ spec:
           ports:
             - name: http
               containerPort: 8080
+          startupProbe:
+            httpGet:
+              path: /livez
+              port: http
+            failureThreshold: 30
+            periodSeconds: 5
           livenessProbe:
             httpGet:
               path: /livez
               port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /readyz
               port: http
+            periodSeconds: 5
