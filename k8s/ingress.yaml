@@ -3,13 +3,11 @@ kind: Ingress
 metadata:
   name: spring-cloud-petclinic-service
   annotations:
-    # cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   ingressClassName: kommander-traefik
   tls:
     - hosts:
         - petclinic.local
-      secretName: petclinic-tls
   rules:
     - host: petclinic.local
       http:

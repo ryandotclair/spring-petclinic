@@ -22,7 +22,8 @@ spec:
   ports:
     - port: 5432
   selector:
-    app: demo-db
+    role: backend
+    tier: database
 
 ---
 apiVersion: apps/v1
@@ -30,16 +31,18 @@ kind: Deployment
 metadata:
   name: demo-db
   labels:
-    app: demo-db
-    app: backend
+    role: backend
+    tier: database
 spec:
   selector:
     matchLabels:
-      app: demo-db
+      role: backend
+      tier: database
   template:
     metadata:
       labels:
-        app: demo-db
+        role: backend
+        tier: database
     spec:
       containers:
         - image: postgres:18.4

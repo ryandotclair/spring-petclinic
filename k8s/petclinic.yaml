@@ -8,7 +8,8 @@ spec:
     - port: 80
       targetPort: 8080
   selector:
-    app: petclinic
+    role: frontend
+    tier: web
 
 ---
 apiVersion: apps/v1
@@ -16,16 +17,19 @@ kind: Deployment
 metadata:
   name: petclinic
   labels:
-    app: frontend
+    role: frontend
+    tier: web
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: petclinic
+      role: frontend
+      tier: web
   template:
     metadata:
       labels:
-        app: petclinic
+        role: frontend
+        tier: web
     spec:
       containers:
         - name: workload
