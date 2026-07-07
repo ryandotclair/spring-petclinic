@@ -19,7 +19,6 @@ metadata:
   labels:
     role: frontend
     tier: web
-    app: spring-cloud-petclinic-service
 spec:
   replicas: 1
   selector:
@@ -34,12 +33,26 @@ spec:
     spec:
       containers:
         - name: workload
-          image: dsyer/petclinic
+          image: 10.38.48.51:5000/demo/petclinic:4.0.0-SNAPSHOT
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
-            - name: SERVICE_BINDING_ROOT
-              value: /bindings
+
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://demo-db:5432/petclinic
+
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db
+                  key: username
+
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db
+                  key: password
+
             - name: SPRING_APPLICATION_JSON
               value: |
                 {
@@ -56,13 +69,3 @@ spec:
             httpGet:
               path: /readyz
               port: http
-          volumeMounts:
-            - mountPath: /bindings/secret
-              name: binding
-              readOnly: true
-      volumes:
-        - name: binding
-          projected:
-            sources:
-              - secret:
-                  name: demo-db
