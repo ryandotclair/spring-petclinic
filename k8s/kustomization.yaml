@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: petclinic
+namespace: pet-clinic
 resources:
   - namespace.yaml
   - db.yaml
@@ -11,7 +11,14 @@ resources:
 images:
   - name: dsyer/petclinic                                # Filter/Match
     newName: 10.38.48.51:5000/petclinic # Replace
+<<<<<<< HEAD
+    newTag: 1.0.0                                         # Appends to name. 
+
+commonLabels:
+  app: spring-cloud-petclinic-service
+=======
     newTag: 4.0.0-SNAPSHOT                                         # Appends to name. 
 
 commonLabels:
   app: spring-cloud-petclinic-service
+>>>>>>> 272884d6d1bf83b5f7f522a21278846ed5ed41e3

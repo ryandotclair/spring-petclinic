@@ -1,8 +1,12 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: petclinic
+  name: pet-clinic
   labels:
+<<<<<<< HEAD
+    app.kubernetes.io/name: pet-clinic
+=======
     app.kubernetes.io/name: petclinic
   annotations:
     prometheus.io/scrape: 'true'
+>>>>>>> 272884d6d1bf83b5f7f522a21278846ed5ed41e3
