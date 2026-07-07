@@ -22,7 +22,7 @@ patches:
       # 1. Update the routing rule to match your raw IP address
       - op: replace
         path: /spec/rules/0/host
-        value: "10.38.48.141" # <-- Replace this with your actual MetalLB LoadBalancer IP
+        value: "pets.local" # <-- Replace this with your FQDN
 
       # 2. Completely strip out the TLS block
       # (Browsers and Cert-Manager will fail/complain if you try to force TLS onto a raw IP)
