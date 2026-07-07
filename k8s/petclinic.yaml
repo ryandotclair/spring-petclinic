@@ -38,19 +38,23 @@ spec:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
 
+            # Credentials + JDBC URL come from the CloudNativePG-managed secret
             - name: SPRING_DATASOURCE_URL
-              value: jdbc:postgresql://demo-db:5432/petclinic
+              valueFrom:
+                secretKeyRef:
+                  name: demo-db-app
+                  key: jdbc-uri
 
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: demo-db
+                  name: demo-db-app
                   key: username
 
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: demo-db
+                  name: demo-db-app
                   key: password
 
             - name: SPRING_APPLICATION_JSON

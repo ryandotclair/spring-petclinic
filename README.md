@@ -1,27 +1,58 @@
 # Ryan's Steps
 
-The Quickstart 
+## The Quickstart
+
+Assumptions:
+- POC / Non-prod
+- Podman
+- Ubuntu
+- CloudNativePG NKP Catalog App Deployed
+- Deploying to an empty NKP Workload cluster (no service using the traefik's root [`/`] route.)
+> Note: Generally recommend bringing your own ingress controller outside of NKP's default Traefik instance as that's used for NKP Platform apps
+
+Typical "don't use some random strangers github code" disclaimer. Double check what gets deployed. As of 7/7/26, the Dockerfile assumed in this has no vulnerabilities image.
+
+Ensure you have java installed
+```bash
+sudo apt install openjdk-17-jdk
+```
+
+And JAVA_HOME path set with optional podman socket exposed
+```bash
+echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> ~/.bashrc
+echo 'export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"'  >> ~/.bashrc
+```
 
 Build the container
-```
-./mvnw spring-boot:build-image -DskipTests
-```
-
-Retag it and push to your registry. Example below.
-```
+```bash
 HABOR_IP="10.38.48.51:5000"
 HARBOR_PROJECT="demo"
-podman tag docker.io/library/spring-petclinic:4.0.0-SNAPSHOT ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT
+podman build -t ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT .
+```
+
+Be sure you're logged into your registry
+```bash
+podman login ${HARBOR_IP} --tls-verify=false
+```
+
+Push to your registry.
+```bash
 podman push ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT --tls-verify=false
 ```
 
+Edit the `k8s/kustomization.yaml` file with your unique values (image name, namespace, ingress fqdn, etc)
+> Note: If no fqdn available, optionally you can use a fake one (ex: pet-clinic.local), and update your /etc/hosts file to point the IP address to it. Ingress controller uses the host header for routing purposes.
 
+Git Commit, and add the repo to an NKP Project's CI/CD.
 
+To confirm deployment:
+```bash
+NAMESPACE="petsclinic"
 
+watch kubectl get cluster,pod,svc,deploy,pvc,ing -n ${NAMESPACE}
+```
 
-
-
-# ORIGINAL BELOW
+# ORIGINAL PETCLINIC README BELOW
 
 # Spring PetClinic Sample Application [![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/maven-build.yml)[![Build Status](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml/badge.svg)](https://github.com/spring-projects/spring-petclinic/actions/workflows/gradle-build.yml)
 

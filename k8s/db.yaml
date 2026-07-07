@@ -1,33 +1,12 @@
 ---
-apiVersion: v1
-kind: Secret
-metadata:
-  name: demo-db
-type: Opaque
-stringData:
-  type: "postgresql"
-  provider: "postgresql"
-  host: "demo-db"
-  port: "5432"
-  database: "petclinic"
-  username: "user"
-  password: "pass"
-
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: demo-db
-spec:
-  ports:
-    - port: 5432
-  selector:
-    role: backend
-    tier: database
-
----
-apiVersion: apps/v1
-kind: Deployment
+# Managed by CloudNativePG. The operator provisions:
+#   - Service demo-db-rw  (primary, read-write)
+#   - Service demo-db-ro  (replicas, read-only)
+#   - Service demo-db-r   (any instance)
+#   - Secret  demo-db-app (username, password, dbname, host, port, uri, jdbc-uri)
+#   - PVC(s) for each instance
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
 metadata:
   name: demo-db
   labels:
@@ -35,44 +14,13 @@ metadata:
     tier: database
     app: spring-cloud-petclinic-service
 spec:
-  selector:
-    matchLabels:
-      role: backend
-      tier: database
-  template:
-    metadata:
-      labels:
-        role: backend
-        tier: database
-    spec:
-      containers:
-        - image: postgres:18.4
-          name: postgresql
-          env:
-            - name: POSTGRES_USER
-              valueFrom:
-                secretKeyRef:
-                  name: demo-db
-                  key: username
-            - name: POSTGRES_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: demo-db
-                  key: password
-            - name: POSTGRES_DB
-              valueFrom:
-                secretKeyRef:
-                  name: demo-db
-                  key: database
-          ports:
-            - containerPort: 5432
-              name: postgresql
-          livenessProbe:
-            tcpSocket:
-              port: postgresql
-          readinessProbe:
-            tcpSocket:
-              port: postgresql
-          startupProbe:
-            tcpSocket:
-              port: postgresql
+  instances: 1
+
+  bootstrap:
+    initdb:
+      database: petclinic
+      owner: petclinic
+
+  storage:
+    storageClass: nutanix-volume
+    size: 10Gi
