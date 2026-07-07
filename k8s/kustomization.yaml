@@ -13,3 +13,18 @@ images:
     newName: 10.38.48.51:5000/demo/petclinic # Replace
     newTag: 4.0.0-SNAPSHOT                   # Appends to name. 
 
+# Update ingress to match
+patches:
+  - target:
+      kind: Ingress
+      name: spring-cloud-petclinic-service
+    patch: |
+      # 1. Update the routing rule to match your raw IP address
+      - op: replace
+        path: /spec/rules/0/host
+        value: "10.38.48.141" # <-- Replace this with your actual MetalLB LoadBalancer IP
+
+      # 2. Completely strip out the TLS block
+      # (Browsers and Cert-Manager will fail/complain if you try to force TLS onto a raw IP)
+      # - op: remove
+      #   path: /spec/tls

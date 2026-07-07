@@ -5,9 +5,9 @@ metadata:
   annotations:
 spec:
   ingressClassName: kommander-traefik
-  tls:
-    - hosts:
-        - petclinic.local
+  # tls:
+  #   - hosts:
+  #       - petclinic.local
   rules:
     - host: petclinic.local
       http:

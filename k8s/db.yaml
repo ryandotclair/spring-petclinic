@@ -37,6 +37,7 @@ metadata:
 spec:
   selector:
     matchLabels:
+      role: backend
       tier: database
   template:
     metadata:
