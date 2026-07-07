@@ -61,41 +61,43 @@ alone will not work** — nothing in the entrypoint passes it through.
 
 ### Toggle on/off with Kustomize
 
-In `k8s/kustomization.yaml`, uncomment the **entire** patch block (enable) or
-re-comment it (disable). Comment out both `patches:` and the list item together —
-a partially commented block breaks YAML and can add the path to `resources` by mistake.
+In `k8s/kustomization.yaml`, comment out **only the first** `patches` entry
+(the `components/remote-debug/patch.yaml` one) to disable. Keep a **single**
+`patches:` list — duplicate `patches:` keys in YAML silently drop earlier entries.
 
 ```yaml
 patches:
-  - path: components/remote-debug/patch.yaml
+  - path: components/remote-debug/patch.yaml   # comment this block to disable
     target:
       kind: Deployment
       name: petclinic
+  - target:
+      kind: Ingress
+      ...
 ```
 
-That injects:
+Verify the patch reached the cluster before attaching:
 
-```text
-JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+```bash
+kubectl kustomize k8s/ | grep JAVA_TOOL_OPTIONS
+kubectl get deploy petclinic -n pet-clinic -o jsonpath='{.spec.template.spec.containers[0].env}' | grep jdwp
+kubectl logs -n pet-clinic deploy/petclinic | grep -i 'Listening for transport'
 ```
 
-and opens container port `5005`. Use `suspend=n` so the app still starts and
-satisfies probes when no debugger is attached.
-
-Commit / sync, then port-forward and attach from VS Code:
+Commit / sync, wait for a **new** pod (rollout), then port-forward in two terminals:
 
 ```bash
 kubectl port-forward -n pet-clinic deploy/petclinic 5005:5005
+kubectl port-forward -n pet-clinic deploy/petclinic 8080:8080
 ```
 
-In VS Code: **Run and Debug → "Attach to Petclinic (K8s)"** (see
-`.vscode/launch.json`). Set breakpoints in `src/main/java/...` and hit the app
-via ingress / `petclinic.local`.
+In VS Code: **Run and Debug → "Attach to Petclinic (K8s)"**. The first attach
+may sit on "Importing projects" while the Java extension indexes — let it finish,
+or run **Java: Import Java Projects** once from the command palette. Then attach again.
 
-Do **not** expose `5005` on a Service or Ingress — port-forward keeps it
-local to your machine. Leave the component commented for "prod" demos.
+Browse locally at `http://localhost:8080` (8080 forward) or via ingress / `petclinic.local`.
 
-Pro Tips:
+## Pro Tips:
 
 To force flux to take most recent change without waiting on the polling cycle:
 ```

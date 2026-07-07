@@ -8,21 +8,12 @@ resources:
   - ingress.yaml
 
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
-# Uncomment the patch block below to enable; re-comment to disable (prod).
+# Comment out the first patch entry below to disable (prod).
 patches:
   - path: components/remote-debug/patch.yaml
     target:
       kind: Deployment
       name: petclinic
-
-# Update images
-images:
-  - name: dsyer/petclinic                    # Filter/Match
-    newName: 10.38.48.51:5000/demo/petclinic # Replace
-    newTag: 4.0.0-SNAPSHOT                   # Appends to name. 
-
-# Update ingress to match
-patches:
   - target:
       kind: Ingress
       name: spring-cloud-petclinic-service
@@ -36,3 +27,9 @@ patches:
       # (Browsers and Cert-Manager will fail/complain if you try to force TLS onto a raw IP)
       # - op: remove
       #   path: /spec/tls
+
+# Update images
+images:
+  - name: dsyer/petclinic                    # Filter/Match
+    newName: 10.38.48.51:5000/demo/petclinic # Replace
+    newTag: 4.0.0-SNAPSHOT                   # Appends to name. 
