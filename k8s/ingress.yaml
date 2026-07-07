@@ -12,7 +12,7 @@ spec:
     - host: petclinic.local
       http:
         paths:
-          - path: /pets
+          - path: /
             pathType: Prefix
             backend:
               service:
