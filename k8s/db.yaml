@@ -33,6 +33,7 @@ metadata:
   labels:
     role: backend
     tier: database
+    app: spring-cloud-petclinic-service
 spec:
   selector:
     matchLabels:
