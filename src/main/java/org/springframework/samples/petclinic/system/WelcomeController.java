@@ -17,13 +17,18 @@
 package org.springframework.samples.petclinic.system;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 class WelcomeController {
 
 	@GetMapping("/")
-	public String welcome() {
+	public String welcome(Model model) {
+		// Break here during a remote debug session, then change welcomeMessage
+		// in the Variables panel (e.g. to "Hello from JDWP!") before continuing.
+		String welcomeMessage = "Welcome";
+		model.addAttribute("welcomeMessage", welcomeMessage);
 		return "welcome";
 	}
 
