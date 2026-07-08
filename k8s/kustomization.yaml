@@ -14,6 +14,7 @@ patches:
     target:
       kind: Deployment
       name: petclinic
+
   - target:
       kind: Ingress
       name: spring-cloud-petclinic-service
@@ -22,11 +23,6 @@ patches:
       - op: replace
         path: /spec/rules/0/host
         value: "petclinic.local" # <-- Replace this with your FQDN
-
-      # 2. Completely strip out the TLS block
-      # (Browsers and Cert-Manager will fail/complain if you try to force TLS onto a raw IP)
-      # - op: remove
-      #   path: /spec/tls
 
 # Update images
 images:
