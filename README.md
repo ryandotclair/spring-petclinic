@@ -4,7 +4,7 @@
 
 Assumptions:
 - POC / Non-prod
-- Podman
+- Podman (v4+)
 - Ubuntu
 - CloudNativePG NKP Catalog App Deployed
 - Deploying to an empty NKP Workload cluster (no service using the traefik's root [`/`] route.)
