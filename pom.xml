@@ -10,7 +10,7 @@
 
   <groupId>org.springframework.samples</groupId>
   <artifactId>spring-petclinic</artifactId>
-  <version>4.0.0-SNAPSHOT</version>
+  <version>1.0.0</version>
 
   <name>petclinic</name>
 
@@ -254,7 +254,12 @@
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-maven-plugin</artifactId>
+	<artifactId>spring-boot-maven-plugin</artifactId>
+	<configuration>
+    <docker>
+      <bindHostToBuilder>true</bindHostToBuilder>
+    </docker>
+  </configuration>
         <executions>
           <execution>
             <!-- Spring Boot Actuator displays build-related information
