@@ -33,36 +33,24 @@ spec:
     spec:
       containers:
         - name: workload
-          image: 10.38.48.51:5000/demo/petclinic:4.0.0-SNAPSHOT
+          image: dsyer/petclinic
           env:
             - name: SPRING_PROFILES_ACTIVE
               value: postgres
 
-            # application-postgres.properties expects POSTGRES_URL / POSTGRES_USER / POSTGRES_PASS
-            # Build URL from CNPG secret fields (do NOT use jdbc-uri — it embeds credentials)
-            - name: PGHOST
+            - name: SPRING_DATASOURCE_URL
               valueFrom:
                 secretKeyRef:
                   name: demo-db-app
-                  key: host
-            - name: PGPORT
-              valueFrom:
-                secretKeyRef:
-                  name: demo-db-app
-                  key: port
-            - name: PGDATABASE
-              valueFrom:
-                secretKeyRef:
-                  name: demo-db-app
-                  key: dbname
-            - name: POSTGRES_URL
-              value: jdbc:postgresql://$(PGHOST):$(PGPORT)/$(PGDATABASE)
-            - name: POSTGRES_USER
+                  key: jdbc-uri
+
+            - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 secretKeyRef:
                   name: demo-db-app
                   key: username
-            - name: POSTGRES_PASS
+
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: demo-db-app
