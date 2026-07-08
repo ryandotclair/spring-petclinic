@@ -254,12 +254,12 @@
       </plugin>
       <plugin>
         <groupId>org.springframework.boot</groupId>
-	<artifactId>spring-boot-maven-plugin</artifactId>
-	<configuration>
-    <docker>
-      <bindHostToBuilder>true</bindHostToBuilder>
-    </docker>
-  </configuration>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <configuration>
+          <docker>
+            <bindHostToBuilder>true</bindHostToBuilder>
+          </docker>
+        </configuration>
         <executions>
           <execution>
             <!-- Spring Boot Actuator displays build-related information

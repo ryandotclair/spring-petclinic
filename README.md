@@ -9,6 +9,7 @@ Assumptions:
 - CloudNativePG NKP Catalog App Deployed
 - Deploying to an empty NKP Workload cluster (no service using the traefik's root [`/`] route.)
 > Note: Generally recommend bringing your own ingress controller outside of NKP's default Traefik instance as that's used for NKP Platform apps
+- NKP Project created
 
 Typical "don't use some random strangers github code" disclaimer. Double check what gets deployed. As of 7/7/26, the Dockerfile assumed in this has no vulnerabilities image.
 
@@ -20,14 +21,35 @@ sudo apt install openjdk-17-jdk
 And JAVA_HOME path set with optional podman socket exposed
 ```bash
 echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> ~/.bashrc
-echo 'export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"'  >> ~/.bashrc
 ```
 
-Build the container
+Podman configurations
+```
+# Point to podman.sock
+export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock
+
+# Save to profile for future logins
+echo 'export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"'  >> ~/.bashrc
+
+# Enable and start the Podman API socket for the current user
+systemctl --user enable --now podman.socket
+
+# Verify the socket is now active and listening
+systemctl --user status podman.socket
+
+# Enable user lingering to prevent the socket from stopping after logout
+loginctl enable-linger $(whoami)
+
+# Verify the socket file now exists
+ls -la /run/user/$(id -u)/podman/podman.sock
+```
+
+Build and retag the container
 ```bash
-HABOR_IP="10.38.48.51:5000"
+HARBOR_IP="10.38.48.51:5000"
 HARBOR_PROJECT="demo"
-podman build -t ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT .
+./mvnw spring-boot:build-image -DskipTests
+podman tag docker.io/library/spring-petclinic:1.0.0 ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:1.0.0
 ```
 
 Be sure you're logged into your registry
@@ -37,7 +59,7 @@ podman login ${HARBOR_IP} --tls-verify=false
 
 Push to your registry.
 ```bash
-podman push ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:4.0.0-SNAPSHOT --tls-verify=false
+podman push ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:1.0.0 --tls-verify=false
 ```
 
 Edit the `k8s/kustomization.yaml` file with your unique values (image name, namespace, ingress fqdn, etc)
@@ -47,23 +69,18 @@ Git Commit, and add the repo to an NKP Project's CI/CD.
 
 To confirm deployment:
 ```bash
-NAMESPACE="pet-clinic"
+NAMESPACE="pet-clinic" # Should match your Project's namespace
 
 watch kubectl get cluster,pod,svc,deploy,pvc,ing -n ${NAMESPACE}
 ```
 
 ## Remote debugging (JDWP) — optional / demos
 
-Spring Boot itself is not special here: any JVM app can accept a debugger via the
-JDWP agent. With this project's Dockerfile (`ENTRYPOINT ["java", "-jar", ...]`),
-set **`JAVA_TOOL_OPTIONS`** (the JVM applies it automatically). **`JAVA_OPTS`
-alone will not work** — nothing in the entrypoint passes it through.
-
 ### Toggle on/off with Kustomize
 
 In `k8s/kustomization.yaml`, comment out **only the first** `patches` entry
 (the `components/remote-debug/patch.yaml` one) to disable. Keep a **single**
-`patches:` list — duplicate `patches:` keys in YAML silently drop earlier entries.
+`patches:` list — duplicate `patches:`.
 
 ```yaml
 patches:
@@ -79,16 +96,15 @@ patches:
 Verify the patch reached the cluster before attaching:
 
 ```bash
-kubectl kustomize k8s/ | grep JAVA_TOOL_OPTIONS
-kubectl get deploy petclinic -n pet-clinic -o jsonpath='{.spec.template.spec.containers[0].env}' | grep jdwp
-kubectl logs -n pet-clinic deploy/petclinic | grep -i 'Listening for transport'
+kubectl get deploy petclinic -n ${NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].env}' | grep jdwp
+kubectl logs -n ${NAMESPACE} deploy/petclinic | grep -i 'Listening for transport'
 ```
 
-Commit / sync, wait for a **new** pod (rollout), then port-forward in two terminals:
+Once confirmed, port-forward in either two different terminals or send them both as background processes (`ps` / `kill <pid>` later):
 
 ```bash
-kubectl port-forward -n pet-clinic deploy/petclinic 5005:5005
-kubectl port-forward -n pet-clinic deploy/petclinic 8080:8080
+kubectl port-forward -n ${NAMESPACE} deploy/petclinic 5005:5005 --insecure-skip-tls-verify &
+kubectl port-forward -n ${NAMESPACE} deploy/petclinic 8080:8080 --insecure-skip-tls-verify &
 ```
 
 In VS Code / Cursor: **Run and Debug → "Attach to Petclinic (K8s)"**.
@@ -96,12 +112,12 @@ In VS Code / Cursor: **Run and Debug → "Attach to Petclinic (K8s)"**.
 **If attach hangs on "Importing projects"** (JDWP/`jdb` already work — this is IDE-only):
 
 1. Open the **`spring-petclinic` folder** as the workspace root (not the parent `git` folder).
-2. Command palette → **Java: Import Java Projects** — wait until the **JAVA PROJECTS** sidebar shows `spring-petclinic` (first run can take 1–3 min while Maven resolves deps).
-3. Status bar should leave **Lightweight Mode** after import. If stuck, run **Java: Clean Java Language Server Workspace** → Reload Window → import again.
-4. `.vscode/settings.json` disables Gradle import (repo has both `pom.xml` and `build.gradle`) and skips `forceBuildBeforeLaunch` on attach.
-5. Attach again with port-forward already running.
+2. Select the pom.xml file and you should be prompted about importing in the JAVA project.
+3. If stuck, run **Java: Clean Java Language Server Workspace** → Reload Window → import again.
+4. Attach once port-forward is running (5005).
+5. Drop a break point (Recommendation: WelcomeController.java file, line 31, to modify the Welcome messaging in memory on the fly)
 
-Browse locally at `http://localhost:8080` (8080 forward) or via ingress / `petclinic.local`.
+Browse locally at `http://localhost:8080` (8080 forward) or via ingress (example: `petclinic.local`, which can be faked by updated your /etc/hosts if you don't have a fqdn).
 
 ## Pro Tips:
 

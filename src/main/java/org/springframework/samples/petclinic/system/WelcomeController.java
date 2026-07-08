@@ -27,7 +27,7 @@ class WelcomeController {
 	public String welcome(Model model) {
 		// Break here during a remote debug session, then change welcomeMessage
 		// in the Variables panel (e.g. to "Hello!") before continuing.
-		String welcomeMessage = "Welcome";
+		String welcomeMessage = "Hi!";
 		model.addAttribute("welcomeMessage", welcomeMessage);
 		return "welcome";
 	}
