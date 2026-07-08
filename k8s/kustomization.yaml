@@ -9,11 +9,11 @@ resources:
 
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
-patches:
-  - path: components/remote-debug/patch.yaml
-    target:
-      kind: Deployment
-      name: petclinic
+# patches:
+#   - path: components/remote-debug/patch.yaml
+#     target:
+#       kind: Deployment
+#       name: petclinic
 
   - target:
       kind: Ingress

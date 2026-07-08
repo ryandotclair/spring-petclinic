@@ -91,9 +91,15 @@ kubectl port-forward -n pet-clinic deploy/petclinic 5005:5005
 kubectl port-forward -n pet-clinic deploy/petclinic 8080:8080
 ```
 
-In VS Code: **Run and Debug → "Attach to Petclinic (K8s)"**. The first attach
-may sit on "Importing projects" while the Java extension indexes — let it finish,
-or run **Java: Import Java Projects** once from the command palette. Then attach again.
+In VS Code / Cursor: **Run and Debug → "Attach to Petclinic (K8s)"**.
+
+**If attach hangs on "Importing projects"** (JDWP/`jdb` already work — this is IDE-only):
+
+1. Open the **`spring-petclinic` folder** as the workspace root (not the parent `git` folder).
+2. Command palette → **Java: Import Java Projects** — wait until the **JAVA PROJECTS** sidebar shows `spring-petclinic` (first run can take 1–3 min while Maven resolves deps).
+3. Status bar should leave **Lightweight Mode** after import. If stuck, run **Java: Clean Java Language Server Workspace** → Reload Window → import again.
+4. `.vscode/settings.json` disables Gradle import (repo has both `pom.xml` and `build.gradle`) and skips `forceBuildBeforeLaunch` on attach.
+5. Attach again with port-forward already running.
 
 Browse locally at `http://localhost:8080` (8080 forward) or via ingress / `petclinic.local`.
 
