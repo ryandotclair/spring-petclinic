@@ -30,4 +30,4 @@ patches:
 images:
   - name: dsyer/petclinic                    # Filter/Match
     newName: 10.38.48.51:5000/demo/petclinic # Replace
-    newTag: 4.0.0-SNAPSHOT                   # Appends to name. 
+    newTag: 4.0.1-SNAPSHOT                   # Appends to name. 

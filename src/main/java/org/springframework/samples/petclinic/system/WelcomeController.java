@@ -26,7 +26,7 @@ class WelcomeController {
 	@GetMapping("/")
 	public String welcome(Model model) {
 		// Break here during a remote debug session, then change welcomeMessage
-		// in the Variables panel (e.g. to "Hello from JDWP!") before continuing.
+		// in the Variables panel (e.g. to "Hello!") before continuing.
 		String welcomeMessage = "Welcome";
 		model.addAttribute("welcomeMessage", welcomeMessage);
 		return "welcome";
