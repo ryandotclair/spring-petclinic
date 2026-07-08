@@ -9,12 +9,14 @@ resources:
 
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
-# patches:
-#   - path: components/remote-debug/patch.yaml
-#     target:
-#       kind: Deployment
-#       name: petclinic
 
+patches:
+  - path: components/remote-debug/patch.yaml
+    target:
+      kind: Deployment
+      name: petclinic
+
+# Update the routing rule to match your FQDN
   - target:
       kind: Ingress
       name: spring-cloud-petclinic-service
@@ -24,7 +26,7 @@ resources:
         path: /spec/rules/0/host
         value: "petclinic.local" # <-- Replace this with your FQDN
 
-# Update images
+# Update Image Location of petclinic
 images:
   - name: dsyer/petclinic                    # Filter/Match
     newName: 10.38.48.51:5000/demo/petclinic # Replace
