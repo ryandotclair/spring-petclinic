@@ -5,7 +5,7 @@
 Assumptions:
 - POC / Non-prod
 - Podman (v4+)
-- Ubuntu
+- Ubuntu (26.04 has Podman 5.x)
 - CloudNativePG NKP Catalog App Deployed
 - Deploying to an empty NKP Workload cluster (no service using the traefik's root [`/`] route.)
 > Note: Generally recommend bringing your own ingress controller outside of NKP's default Traefik instance as that's used for NKP Platform apps
