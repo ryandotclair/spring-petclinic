@@ -27,7 +27,7 @@ spec:
   interval: 30m
   sourceRef:
     kind: GitRepository
-    name: pet-clinic-repository
+    name: pet-clinic
   git:
     commit:
       author:
