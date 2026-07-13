@@ -25,12 +25,13 @@ patches:
       - op: replace
         path: /spec/rules/0/host
         value: "petclinic.local" # <-- Replace this with your FQDN
-      - op: replace
-        path: /spec/git/commit/author/name
-        value: "fluxcdbot"       # <-- Optional: Replace this with your bot name
-      - op: replace
-        path: /spec/git/commit/author/email
-        value: "fluxcdbot@users.noreply.github.com" # <-- Optional: Replace this with your bot email
+      # 2. Update the commit author name and email
+      # - op: replace
+      #   path: /spec/git/commit/author/name
+      #   value: "fluxcdbot"       # <-- Optional: Replace this with your bot name
+      # - op: replace
+      #   path: /spec/git/commit/author/email
+      #   value: "fluxcdbot@users.noreply.github.com" # <-- Optional: Replace this with your bot email
 
   - target:
       kind: ImageUpdateAutomation
