@@ -54,5 +54,5 @@ patches:
 # Update Image Location of petclinic
 images:
   - name: dsyer/petclinic                    # Filter/Match
-    newName: 10.38.48.51:5000/demo/petclinic # {"$imagepolicy": "pet-clinic:pet-clinic-policy:name"}
+    newName: 10.38.48.51:5000/demo/petclinic # Put in your own registry address and project name
     newTag: 1.0.0                            # {"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}
