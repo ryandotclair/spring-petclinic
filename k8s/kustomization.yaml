@@ -30,7 +30,7 @@ patches:
 # Update the image repository to match your new location
   - target:
       kind: ImageRepository
-      name: petclinic
+      name: pet-clinic-repository
     patch: |
       - op: replace
         path: /spec/image
