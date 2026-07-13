@@ -39,7 +39,7 @@ patches:
 # Update the image update automation to match namespace of NKP Project and optional commit details.
   - target:
       kind: ImageUpdateAutomation
-      name: petclinic-update
+      name: pet-clinic-update
     patch: |
       - op: replace
         path: /spec/sourceRef/name
