@@ -31,12 +31,12 @@ spec:
   git:
     checkout:
       ref:
-        branch: image-automation
+        branch: main
     commit:
       author:
         email: fluxcdbot@users.noreply.github.com
         name: fluxcdbot
     push:
-      branch: image-automation
+      branch: main
   update:
     path: ./k8s/kustomization.yaml

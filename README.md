@@ -67,15 +67,44 @@ Edit the `k8s/kustomization.yaml` file with your unique values (image name, name
 
 Git Commit.
 
-Add the repo to an NKP Project's `Continuous Deployment (CD)` (this guide assumes you called it `pet-clinic`). 
+In your NKP Project, create a Secret that includes your git's username and password (ex: GitHub PAT)
 
-In the NKP Project's `Secret` tab, create a new Secret for your git access. Flux's Image Update Automation will use this to automatically update the yaml (specifically in `k8s/kustomization.yaml` file, keys on `{"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}`), and automatically update it based on the `ImagePolicy`'s rules... in this case `spec.policy.range` rules.
+Then add the git repo to an NKP Project's `Continuous Deployment (CD)` (this guide assumes you called it `pet-clinic`). Make sure and point to main branch and reference the secret you just created. Flux will do a git commit on your behalf, based on the latest 1.x.x tag (this repo's `ImagePolicy` rule) it sees in Harbor (specifically in `k8s/kustomization.yaml` file, keys on `{"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}`).
 
 To confirm deployment:
 ```bash
 NAMESPACE="pet-clinic" # Should match your Project's namespace
 
 watch kubectl get cluster,pod,svc,deploy,pvc,ing -n ${NAMESPACE}
+```
+
+## Test Flux Image Automation
+
+Update the `pom.xml` file, rev up the pet clinic version found here:
+```
+  <groupId>org.springframework.samples</groupId>
+  <artifactId>spring-petclinic</artifactId>
+  <version>1.0.0</version>
+```
+> Note: The current policy only allows changes to 1.x.x. So if you change the major version, it will ignore it. You can modify this behavior in k8s/image-automation.yaml
+
+Build the new container
+```
+./mvnw spring-boot:build-image -DskipTests
+```
+
+Then Tag/Push it
+```bash
+TAG_VERSION=1.0.2
+podman tag docker.io/library/spring-petclinic:${TAG_VERSION} ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:${TAG_VERSION} && podman push ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:${TAG_VERSION} --tls-verify=false
+```
+
+If you're impatient and want to see flux immediately act on this new change (it has various polling cycles), you can use this simple trick:
+
+```bash
+alias forceflux='flux reconcile image repository pet-clinic-repository -n ${NAMESPACE} && flux reconcile source git pet-clinic -n ${NAMESPACE} && flux reconcile kustomization pet-clinic -n ${NAMESPACE}'
+
+forceflux
 ```
 
 ## Remote debugging (JDWP) — optional / demos
@@ -122,13 +151,6 @@ In VS Code / Cursor: **Run and Debug → "Attach to Petclinic (K8s)"**.
 5. Drop a break point (Recommendation: WelcomeController.java file, line 31, to modify the Welcome messaging in memory on the fly)
 
 Browse locally at `http://localhost:8080` (8080 forward) or via ingress (example: `petclinic.local`, which can be faked by updated your /etc/hosts if you don't have a fqdn).
-
-## Pro Tips:
-
-To force flux to take most recent change without waiting on the polling cycle:
-```
-alias forceflux='flux reconcile source git pet-clinic -n ${NAMESPACE} && flux reconcile kustomization pet-clinic -n ${NAMESPACE}'
-```
 
 # ORIGINAL PETCLINIC README BELOW
 
