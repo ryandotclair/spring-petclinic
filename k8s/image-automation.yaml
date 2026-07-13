@@ -5,6 +5,8 @@ metadata:
 spec:
   image: 10.38.48.51:5000/demo/petclinic
   interval: 5h
+  certSecretRef:
+    name: tls-root-ca 
 ---
 apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImagePolicy
