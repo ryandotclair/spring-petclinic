@@ -3,7 +3,7 @@ kind: ImageRepository
 metadata:
   name: pet-clinic
 spec:
-  image: ghcr.io/stefanprodan/podinfo
+  image: 10.38.48.51:5000/demo/petclinic
   interval: 5h
 ---
 apiVersion: image.toolkit.fluxcd.io/v1
