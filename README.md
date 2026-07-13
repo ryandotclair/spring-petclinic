@@ -9,7 +9,7 @@ Assumptions:
 - CloudNativePG NKP Catalog App Deployed
 - Deploying to an empty NKP Workload cluster (no service using the traefik's root [`/`] route.)
 > Note: Generally recommend bringing your own ingress controller outside of NKP's default Traefik instance as that's used for NKP Platform apps
-- NKP Project created
+- NKP Project created (guide assumes it's called `pet-clinic`)
 
 Typical "don't use some random strangers github code" disclaimer. Double check what gets deployed. As of 7/7/26, the Dockerfile assumed in this has no vulnerabilities image.
 
@@ -62,10 +62,14 @@ Push to your registry.
 podman push ${HARBOR_IP}/${HARBOR_PROJECT}/petclinic:1.0.0 --tls-verify=false
 ```
 
-Edit the `k8s/kustomization.yaml` file with your unique values (image name, namespace, ingress fqdn, etc)
+Edit the `k8s/kustomization.yaml` file with your unique values (image name, namespace, ingress fqdn, etc). 
 > Note: If no fqdn available, optionally you can use a fake one (ex: pet-clinic.local), and update your /etc/hosts file to point the IP address to it. Ingress controller uses the host header for routing purposes.
 
-Git Commit, and add the repo to an NKP Project's CI/CD.
+Git Commit.
+
+Add the repo to an NKP Project's `Continuous Deployment (CD)` (this guide assumes you called it `pet-clinic`). 
+
+In the NKP Project's `Secret` tab, create a new Secret for your git access. Flux's Image Update Automation will use this to automatically update the yaml (specifically in `k8s/kustomization.yaml` file, keys on `{"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}`), and automatically update it based on the `ImagePolicy`'s rules... in this case `spec.policy.range` rules.
 
 To confirm deployment:
 ```bash
@@ -87,7 +91,7 @@ patches:
   - path: components/remote-debug/patch.yaml   # comment this block to disable
     target:
       kind: Deployment
-      name: petclinic
+      name: pet-clinic
   - target:
       kind: Ingress
       ...
@@ -96,7 +100,7 @@ patches:
 Verify the patch reached the cluster before attaching:
 
 ```bash
-kubectl get deploy petclinic -n ${NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].env}' | grep jdwp
+kubectl get deploy pet-clinic -n ${NAMESPACE} -o jsonpath='{.spec.template.spec.containers[0].env}' | grep jdwp
 kubectl logs -n ${NAMESPACE} deploy/petclinic | grep -i 'Listening for transport'
 ```
 
@@ -123,7 +127,7 @@ Browse locally at `http://localhost:8080` (8080 forward) or via ingress (example
 
 To force flux to take most recent change without waiting on the polling cycle:
 ```
-alias forceflux='flux reconcile source git petclinic -n ${NAMESPACE} && flux reconcile kustomization petclinic -n ${NAMESPACE}'
+alias forceflux='flux reconcile source git pet-clinic -n ${NAMESPACE} && flux reconcile kustomization pet-clinic -n ${NAMESPACE}'
 ```
 
 # ORIGINAL PETCLINIC README BELOW
