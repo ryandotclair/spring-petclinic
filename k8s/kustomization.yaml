@@ -6,6 +6,7 @@ resources:
   - db.yaml
   - petclinic.yaml
   - ingress.yaml
+  - image-automation.yaml
 
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
