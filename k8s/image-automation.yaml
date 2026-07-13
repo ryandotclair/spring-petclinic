@@ -1,0 +1,37 @@
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageRepository
+metadata:
+  name: pet-clinic
+spec:
+  image: ghcr.io/stefanprodan/podinfo
+  interval: 5h
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImagePolicy
+metadata:
+  name: pet-clinic-policy
+spec:
+  imageRepositoryRef:
+    name: pet-clinic
+  policy:
+    semver:
+      range: 1.x.x
+---
+apiVersion: image.toolkit.fluxcd.io/v1
+kind: ImageUpdateAutomation
+metadata:
+  name: pet-clinic-update
+spec:
+  interval: 30m
+  sourceRef:
+    kind: GitRepository
+    name: pet-clinic
+  git:
+    commit:
+      author:
+        email: fluxcdbot@users.noreply.github.com
+        name: fluxcdbot
+    push:
+      branch: main
+  update:
+    path: ./k8s

@@ -25,9 +25,26 @@ patches:
       - op: replace
         path: /spec/rules/0/host
         value: "petclinic.local" # <-- Replace this with your FQDN
+      - op: replace
+        path: /spec/git/commit/author/name
+        value: "fluxcdbot"       # <-- Optional: Replace this with your bot name
+      - op: replace
+        path: /spec/git/commit/author/email
+        value: "fluxcdbot@users.noreply.github.com" # <-- Optional: Replace this with your bot email
+
+  - target:
+      kind: ImageUpdateAutomation
+      name: petclinic-update
+    patch: |
+      - op: replace
+        path: /spec/sourceRef/name
+        value: pet-clinic         # <-- Replace this with the name of the NKP Project
 
 # Update Image Location of petclinic
 images:
   - name: dsyer/petclinic                    # Filter/Match
-    newName: 10.38.48.51:5000/demo/petclinic # Replace
-    newTag: 1.0.0                            # Appends to name. 
+    newName: 10.38.48.51:5000/demo/petclinic # {"$imagepolicy": "pet-clinic:pet-clinic-policy:name"}
+    newTag: 1.0.0                            # {"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}
+  - name: ghcr.io/stefanprodan/podinfo         # Filter/Match
+    newName: 10.38.48.51:5000/demo/petclinic   # Replace
+    newTag: 1.0.0                              # Appends to name. 
