@@ -50,4 +50,4 @@ patches:
 images:
   - name: dsyer/petclinic # Filter/Match
     newName: 10.38.48.51:5000/demo/petclinic # {"$imagepolicy": "pet-clinic:pet-clinic-policy:name"}
-    newTag: 1.0.0 # {"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}
+    newTag: 1.0.1 # {"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}
