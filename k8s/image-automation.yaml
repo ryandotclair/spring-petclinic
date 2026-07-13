@@ -36,4 +36,4 @@ spec:
     push:
       branch: main
   update:
-    path: ./k8s
+    path: ./
