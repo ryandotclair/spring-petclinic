@@ -1,6 +1,6 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
-namespace: pet-clinic
+namespace: pet-clinic # <-- Replace this with the name of the NKP Project name
 resources:
   - namespace.yaml
   - db.yaml
@@ -8,6 +8,7 @@ resources:
   - ingress.yaml
   - image-automation.yaml
 
+# Assumes both the NKP Project name and the gitops name is pet-clinic
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
 
@@ -43,7 +44,7 @@ patches:
     patch: |
       - op: replace
         path: /spec/sourceRef/name
-        value: pet-clinic         # <-- Replace this with the name of the NKP Project
+        value: pet-clinic         # <-- Replace this with the name of the gitops name
       - op: replace
         path: /spec/git/commit/author/name
         value: "fluxcdbot"       # <-- Optional: Replace this with your bot name
