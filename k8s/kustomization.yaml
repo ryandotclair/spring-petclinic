@@ -7,18 +7,15 @@ resources:
   - petclinic.yaml
   - ingress.yaml
   - image-automation.yaml
-
 # Assumes both the NKP Project name and the gitops name is pet-clinic
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
-
 patches:
   - path: components/remote-debug/patch.yaml
     target:
       kind: Deployment
       name: petclinic
-
-# Update the routing rule to match your FQDN
+      # Update the routing rule to match your FQDN
   - target:
       kind: Ingress
       name: spring-cloud-petclinic-service
@@ -27,8 +24,7 @@ patches:
       - op: replace
         path: /spec/rules/0/host
         value: "petclinic.local" # <-- Replace this with your FQDN
-
-# Update the image repository to match your new location
+    # Update the image repository to match your new location
   - target:
       kind: ImageRepository
       name: pet-clinic-repository
@@ -36,8 +32,7 @@ patches:
       - op: replace
         path: /spec/image
         value: 10.38.48.51:5000/demo/petclinic
-
-# Update the image update automation to match namespace of NKP Project and optional commit details.
+    # Update the image update automation to match namespace of NKP Project and optional commit details.
   - target:
       kind: ImageUpdateAutomation
       name: pet-clinic-update
@@ -51,9 +46,8 @@ patches:
       - op: replace
         path: /spec/git/commit/author/email
         value: "fluxcdbot@users.noreply.github.com" # <-- Optional: Replace this with your bot email
-
 # Update Image Location of petclinic
 images:
-  - name: dsyer/petclinic                    # Filter/Match
+  - name: dsyer/petclinic # Filter/Match
     newName: 10.38.48.51:5000/demo/petclinic # {"$imagepolicy": "pet-clinic:pet-clinic-policy:name"}
-    newTag: 1.0.0                            # {"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}
+    newTag: 1.0.2 # {"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}
