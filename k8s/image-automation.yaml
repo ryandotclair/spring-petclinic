@@ -29,11 +29,14 @@ spec:
     kind: GitRepository
     name: pet-clinic
   git:
+    checkout:
+      ref:
+        branch: image-automation
     commit:
       author:
         email: fluxcdbot@users.noreply.github.com
         name: fluxcdbot
     push:
-      branch: main
+      branch: image-automation
   update:
     path: ./k8s/kustomization.yaml
