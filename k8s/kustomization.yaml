@@ -6,7 +6,7 @@ resources:
   - db.yaml
   - petclinic.yaml
   - ingress.yaml
-  - image-automation.yaml
+  # - image-automation.yaml 
 # Assumes both the NKP Project name and the gitops name is pet-clinic
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
