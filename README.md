@@ -69,7 +69,9 @@ Git Commit.
 
 In your NKP Project, create a Secret that includes your git's username and password (ex: GitHub PAT)
 
-Then add the git repo to an NKP Project's `Continuous Deployment (CD)` (this guide assumes you called it `pet-clinic`). Make sure and point to main branch and reference the secret you just created. Flux will do a git commit on your behalf, based on the latest 1.x.x tag (this repo's `ImagePolicy` rule) it sees in Harbor (specifically in `k8s/kustomization.yaml` file, keys on `{"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}`).
+Then add the git repo to an NKP Project's `Continuous Deployment (CD)` (this guide assumes you called it `pet-clinic`). Make sure and point to main branch and reference the git secret you just created, and the path is `./k8s`. 
+
+If using the image-automation manifest (NKP 2.17+ feature), Flux will do a git commit on your behalf, based on the latest 1.x.x tag (this repo's `ImagePolicy` rule) it sees in Harbor (specifically in `k8s/kustomization.yaml` file, keys on the commented `{"$imagepolicy": "pet-clinic:pet-clinic-policy:tag"}`).
 
 To confirm deployment:
 ```bash
@@ -79,6 +81,8 @@ watch kubectl get cluster,pod,svc,deploy,pvc,ing -n ${NAMESPACE}
 ```
 
 ## Test Flux Image Automation
+
+Ensure you are on NKP 2.17.0 or higher, and uncomment `- image-automation.yaml` in the kustomization.yaml file. Git commit/push if you haven't already.
 
 Update the `pom.xml` file, rev up the pet clinic version found here:
 ```
@@ -107,13 +111,12 @@ alias forceflux='flux reconcile image repository pet-clinic-repository -n ${NAME
 forceflux
 ```
 
-## Remote debugging (JDWP) — optional / demos
+## Remote debugging (JDWP)
 
 ### Toggle on/off with Kustomize
 
 In `k8s/kustomization.yaml`, comment out **only the first** `patches` entry
-(the `components/remote-debug/patch.yaml` one) to disable. Keep a **single**
-`patches:` list — duplicate `patches:`.
+(the `components/remote-debug/patch.yaml` one) to disable.
 
 ```yaml
 patches:
@@ -140,15 +143,17 @@ kubectl port-forward -n ${NAMESPACE} deploy/petclinic 5005:5005 --insecure-skip-
 kubectl port-forward -n ${NAMESPACE} deploy/petclinic 8080:8080 --insecure-skip-tls-verify &
 ```
 
-In VS Code / Cursor: **Run and Debug → "Attach to Petclinic (K8s)"**.
+In VS Code: **Run and Debug → "Attach to Petclinic (K8s)"**.
 
-**If attach hangs on "Importing projects"** (JDWP/`jdb` already work — this is IDE-only):
-
+### Troubleshooting
+If attach hangs on "Importing projects":
 1. Open the **`spring-petclinic` folder** as the workspace root (not the parent `git` folder).
 2. Select the pom.xml file and you should be prompted about importing in the JAVA project.
 3. If stuck, run **Java: Clean Java Language Server Workspace** → Reload Window → import again.
-4. Attach once port-forward is running (5005).
-5. Drop a break point (Recommendation: WelcomeController.java file, line 31, to modify the Welcome messaging in memory on the fly)
+4. Attach once port-forward is running (5005). I've notice sometime port forward can drop.
+
+### To Test
+Drop a break point (Recommendation: WelcomeController.java file, line 31, to modify the Welcome messaging in memory on the fly)
 
 Browse locally at `http://localhost:8080` (8080 forward) or via ingress (example: `petclinic.local`, which can be faked by updated your /etc/hosts if you don't have a fqdn).
 

@@ -6,7 +6,8 @@ resources:
   - db.yaml
   - petclinic.yaml
   - ingress.yaml
-  # - image-automation.yaml 
+  # - image-automation.yaml # <--- Commented out to disable image automation (NKP 2.17+ feature)
+
 # Assumes both the NKP Project name and the gitops name is pet-clinic
 # Toggle remote JDWP debugging (dev demos only — never leave on in prod).
 # Comment out the first patch entry below to disable (prod).
