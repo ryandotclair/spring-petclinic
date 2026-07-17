@@ -26,7 +26,7 @@ echo "export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64" >> ~/.bashrc
 Podman configurations
 ```
 # Point to podman.sock
-export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock
+export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"
 
 # Save to profile for future logins
 echo 'export DOCKER_HOST="unix:///run/user/$(id -u)/podman/podman.sock"'  >> ~/.bashrc
